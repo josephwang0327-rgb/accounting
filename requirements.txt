@@ -1,2 +1,3 @@
-flask
-line_bot_interface
+Flask
+line-bot-sdk
+sqlite3
