@@ -1,37 +1,45 @@
-from flask import Flask, request, jsonify
+import os
+from flask import Flask, request, abort, jsonify
+from linebot import LineBotApi, WebhookHandler
+from linebot.exceptions import InvalidSignatureError
+from linebot.models import MessageEvent, TextMessage, TextSendMessage
 
 def create_line_bot(app, handle_message_callback):
-    """
-    建立 Line Bot webhook handler。
-    參數:
-        app: Flask app
-        handle_message_callback: function, 接收 (user_id, message_text) 兩個參數
-                                 返回要回覆的文字
-    """
+
+    # 從環境變數讀取
+    CHANNEL_SECRET = os.getenv("LINE_CHANNEL_SECRET")
+    ACCESS_TOKEN = os.getenv("LINE_CHANNEL_ACCESS_TOKEN")
+
+    if not CHANNEL_SECRET or not ACCESS_TOKEN:
+        raise ValueError("請先設定環境變數 LINE_CHANNEL_SECRET 與 LINE_CHANNEL_ACCESS_TOKEN")
+
+    line_bot_api = LineBotApi(ACCESS_TOKEN)
+    handler = WebhookHandler(CHANNEL_SECRET)
 
     @app.route("/callback", methods=['POST'])
     def callback():
-        data = request.get_json()
-        # 簡單檢查格式
-        if "events" not in data or len(data["events"]) == 0:
-            return jsonify({"status": "no events"})
+        signature = request.headers.get('X-Line-Signature', '')
+        body = request.get_data(as_text=True)
 
-        event = data["events"][0]
+        try:
+            handler.handle(body, signature)
+        except InvalidSignatureError:
+            abort(400)
 
-        # 目前只處理文字訊息
-        if event.get("type") != "message" or event["message"]["type"] != "text":
-            return jsonify({"status": "ignored"})
+        return 'OK'
 
-        user_id = event["source"]["userId"]
-        message_text = event["message"]["text"]
+    @handler.add(MessageEvent, message=TextMessage)
+    def handle_text_message(event):
+        user_id = event.source.user_id
+        message_text = event.message.text
 
-        # 呼叫 main 提供的 callback 去處理訊息
+        # 呼叫 main 提供的函式
         reply_text = handle_message_callback(user_id, message_text)
 
-        # 回覆給 Line
-        return jsonify({
-            "status": "ok",
-            "reply": reply_text
-        })
+        # 回覆 LINE
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=reply_text)
+        )
 
     return app
