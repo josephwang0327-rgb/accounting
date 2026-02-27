@@ -8,7 +8,7 @@ def init_db():
     cursor = conn.cursor()
 
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS records (
+    CREATE TABLE IF NOT EXISTS transactions (
         id SERIAL PRIMARY KEY,
         category TEXT NOT NULL,
         amount INTEGER NOT NULL,
