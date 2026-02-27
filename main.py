@@ -6,7 +6,7 @@ from datetime import datetime
 DB_PATH = "my_transactions.db"
 
 # 初始化資料庫
-init_db(DB_PATH)
+init_db()
 
 app = Flask(__name__)
 
@@ -29,7 +29,7 @@ def handle_message(user_id, message_text):
             amount = float(parts[1])
             note = parts[2] if len(parts) == 3 else None
 
-            add_transaction(DB_PATH, purpose, amount, note)
+            add_transaction(purpose, amount, note)
             return f"已紀錄支出: {purpose} {amount} 元" + (f"，備註: {note}" if note else "")
 
         except ValueError:
@@ -47,7 +47,7 @@ def handle_message(user_id, message_text):
             amount = float(parts[1])
             note = parts[2] if len(parts) == 3 else None
 
-            add_transaction(DB_PATH, purpose, amount, note)
+            add_transaction(purpose, amount, note)
             return f"已紀錄收入: {purpose} {amount} 元" + (f"，備註: {note}" if note else "")
 
         except ValueError:
@@ -56,13 +56,13 @@ def handle_message(user_id, message_text):
     # 查詢今天總支出
     elif message_text.lower() == "today":
         today_str = datetime.now().strftime("%Y-%m-%d")
-        total = get_daily_total(DB_PATH, today_str)
+        total = get_daily_total(today_str)
         return f"今天總支出: {total} 元"
 
     # 查詢今天明細
     elif message_text.lower() == "list":
         today_str = datetime.now().strftime("%Y-%m-%d")
-        rows = get_transactions(DB_PATH, today_str)
+        rows = get_transactions(today_str)
         if not rows:
             return "今天沒有任何紀錄。"
         reply = "今天紀錄:\n"
