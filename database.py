@@ -1,18 +1,19 @@
 import sqlite3
 from datetime import datetime
+import psycopg2
+import os
 
 def init_db(db_path):
-    conn = sqlite3.connect(db_path)
-    cur = conn.cursor()
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS transactions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            purpose TEXT NOT NULL,
-            amount REAL NOT NULL,
-            note TEXT,
-            created_at TEXT NOT NULL
-        )
-    ''')
+    conn = psycopg2.connect(os.environ["DATABASE_URL"])
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS records (
+        id SERIAL PRIMARY KEY,
+        amount INTEGER,
+        category TEXT
+    )
+    """)
     conn.commit()
     conn.close()
 
