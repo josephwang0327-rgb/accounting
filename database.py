@@ -24,7 +24,7 @@ def add_transaction(category, amount, note=None):
     cur = conn.cursor()
     now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     cur.execute(
-        "INSERT INTO transactions (category, amount, note, created_at) VALUES (%s, %d, %s, %s)",
+        "INSERT INTO transactions (category, amount, note, created_at) VALUES (%s, %f, %s, %s)",
         (category, amount, note, now)
     )
     conn.commit()
