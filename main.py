@@ -25,12 +25,12 @@ def handle_message(user_id, message_text):
             parts = content.split(maxsplit=2)  # 最多拆成三個部分
             if len(parts) < 2:
                 return "格式錯誤，請輸入: spend 用途 金額 [備註]"
-            purpose = parts[0]
+            category = parts[0]
             amount = float(parts[1])
             note = parts[2] if len(parts) == 3 else None
 
-            add_transaction(purpose, amount, note)
-            return f"已紀錄支出: {purpose} {amount} 元" + (f"，備註: {note}" if note else "")
+            add_transaction(category, amount, note)
+            return f"已紀錄支出: {category} {amount} 元" + (f"，備註: {note}" if note else "")
 
         except ValueError:
             return "金額格式錯誤，請輸入數字。"
@@ -43,12 +43,12 @@ def handle_message(user_id, message_text):
             parts = content.split(maxsplit=2)
             if len(parts) < 2:
                 return "格式錯誤，請輸入: income 來源 金額 [備註]"
-            purpose = parts[0]
+            category = parts[0]
             amount = float(parts[1])
             note = parts[2] if len(parts) == 3 else None
 
-            add_transaction(purpose, amount, note)
-            return f"已紀錄收入: {purpose} {amount} 元" + (f"，備註: {note}" if note else "")
+            add_transaction(category, amount, note)
+            return f"已紀錄收入: {category} {amount} 元" + (f"，備註: {note}" if note else "")
 
         except ValueError:
             return "金額格式錯誤，請輸入數字。"
@@ -67,8 +67,8 @@ def handle_message(user_id, message_text):
             return "今天沒有任何紀錄。"
         reply = "今天紀錄:\n"
         for r in rows:
-            purpose, amount, note, created_at = r
-            reply += f"{created_at} - {purpose} {amount} 元"
+            category, amount, note, created_at = r
+            reply += f"{created_at} - {category} {amount} 元"
             if note:
                 reply += f" ({note})"
             reply += "\n"
