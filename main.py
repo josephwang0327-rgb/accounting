@@ -75,7 +75,7 @@ def handle_message(user_id, message_text):
         return reply
 
     else:
-        return "沒辨識到指令，請用 spend/income 開頭，或輸入 today/list 查詢"
+        return "沒指令，請用 spend/income 開頭，或輸入 today/list 查詢"
 
 # 將 Flask app 與 Line Bot handler 結合
 create_line_bot(app, handle_message)

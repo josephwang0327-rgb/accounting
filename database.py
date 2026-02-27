@@ -24,7 +24,7 @@ def add_transaction(category, amount, note=None):
     cur = conn.cursor()
     now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     cur.execute(
-        "INSERT INTO transactions (category, amount, note, created_at) VALUES ",
+        "INSERT INTO transactions (category, amount, note, created_at) VALUES (%s, %d, %s, %s)",
         (category, amount, note, now)
     )
     conn.commit()
@@ -34,7 +34,7 @@ def get_daily_total(date_str):
     conn = psycopg2.connect(os.environ["DATABASE_URL"])
     cur = conn.cursor()
     cur.execute(
-        "SELECT SUM(amount) FROM transactions WHERE DATE(created_at) = ?",
+        "SELECT SUM(amount) FROM transactions WHERE DATE(created_at) = %s",
         (date_str,)
     )
     total = cur.fetchone()[0] or 0
@@ -45,7 +45,7 @@ def get_transactions(date_str):
     conn = psycopg2.connect(os.environ["DATABASE_URL"])
     cur = conn.cursor()
     cur.execute(
-        "SELECT category, amount, note, created_at FROM transactions WHERE DATE(created_at) = ? ORDER BY created_at ASC",
+        "SELECT category, amount, note, created_at FROM transactions WHERE DATE(created_at) = %s ORDER BY created_at ASC",
         (date_str,)
     )
     rows = cur.fetchall()
