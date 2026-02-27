@@ -10,20 +10,22 @@ def init_db():
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS records (
         id SERIAL PRIMARY KEY,
-        amount INTEGER,
-        category TEXT
+        category TEXT NOT NULL,
+        amount INTEGER NOT NULL,
+        note TEXT,
+        created_at TEXT NOT NULL
     )
     """)
     conn.commit()
     conn.close()
 
-def add_transaction(purpose, amount, note=None):
+def add_transaction(category, amount, note=None):
     conn = psycopg2.connect(os.environ["DATABASE_URL"])
     cur = conn.cursor()
     now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     cur.execute(
-        "INSERT INTO transactions (purpose, amount, note, created_at) VALUES (?, ?, ?, ?)",
-        (purpose, amount, note, now)
+        "INSERT INTO transactions (category, amount, note, created_at) VALUES (?, ?, ?, ?)",
+        (category, amount, note, now)
     )
     conn.commit()
     conn.close()
@@ -43,7 +45,7 @@ def get_transactions(date_str):
     conn = psycopg2.connect(os.environ["DATABASE_URL"])
     cur = conn.cursor()
     cur.execute(
-        "SELECT purpose, amount, note, created_at FROM transactions WHERE DATE(created_at) = ? ORDER BY created_at ASC",
+        "SELECT category, amount, note, created_at FROM transactions WHERE DATE(created_at) = ? ORDER BY created_at ASC",
         (date_str,)
     )
     rows = cur.fetchall()
