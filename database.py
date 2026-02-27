@@ -3,7 +3,7 @@ from datetime import datetime
 import psycopg2
 import os
 
-def init_db(db_path):
+def init_db():
     conn = psycopg2.connect(os.environ["DATABASE_URL"])
     cursor = conn.cursor()
 
