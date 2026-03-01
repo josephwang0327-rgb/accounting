@@ -59,7 +59,7 @@ def handle_message(user_id, message_text):
         return f"今天總支出: {total} 元"
 
     # 查詢今天明細
-    elif message_text.startswith("list"):
+    elif message_text.lower() == "list":
         today_str = datetime.now().strftime("%Y-%m-%d")
         rows = get_transactions(today_str)
         if not rows:
@@ -72,7 +72,7 @@ def handle_message(user_id, message_text):
                 reply += f" ({note})"
             reply += "\n"
         return reply
-    elif message_text.lower() == "get":
+    elif message_text.startswith("get "):
         content = message_text[4:].strip()
         date_str= content if content else datetime.now().strftime("%Y-%m-%d")
         rows = get_one_day_transactions(date_str)
