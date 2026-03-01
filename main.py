@@ -59,7 +59,7 @@ def handle_message(user_id, message_text):
         return f"今天總支出: {total} 元"
 
     # 查詢今天明細
-    elif message_text.lower() == "list":
+    elif message_text.startswith("list"):
         today_str = datetime.now().strftime("%Y-%m-%d")
         rows = get_transactions(today_str)
         if not rows:
