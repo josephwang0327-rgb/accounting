@@ -72,6 +72,20 @@ def handle_message(user_id, message_text):
                 reply += f" ({note})"
             reply += "\n"
         return reply
+    elif message_text.lower() == "get":
+        content = message_text[3:].strip()
+        date_str= content if content else datetime.now().strftime("%Y-%m-%d")
+        rows = get_one_day_transactions(date_str)
+        if not rows:
+            return f"{date_str} 沒有紀錄。"
+        reply = f"{date_str} 紀錄:\n"
+        for r in rows:
+            category, amount, note, created_at = r
+            reply += f"{created_at} - {category} {amount} 元"
+            if note:
+                reply += f" ({note})"
+            reply += "\n"
+        return reply
 
     else:
         return "沒指令，請用 spend/income 開頭，或輸入 today/list 查詢"
