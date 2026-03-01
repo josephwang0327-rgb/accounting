@@ -51,3 +51,14 @@ def get_transactions(date_str):
     rows = cur.fetchall()
     conn.close()
     return rows
+
+def get_one_day_transactions(date_str):
+    conn = psycopg2.connect(os.environ["DATABASE_URL"])
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT category, amount, note, created_at FROM transactions WHERE DATE(created_at) = %s ORDER BY created_at ASC",
+        (date_str,)
+    )
+    rows = cur.fetchall()
+    conn.close()
+    return rows

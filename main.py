@@ -3,7 +3,6 @@ from line_bot_interface import create_line_bot
 from database import init_db, add_transaction, get_daily_total, get_transactions
 from datetime import datetime
 
-DB_PATH = "my_transactions.db"
 
 # 初始化資料庫
 init_db()
