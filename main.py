@@ -1,6 +1,6 @@
 from flask import Flask
 from line_bot_interface import create_line_bot
-from database import init_db, add_transaction, get_daily_total, get_transactions
+from database import init_db, add_transaction, get_daily_total, get_transactions, get_one_day_transactions
 from datetime import datetime
 
 
@@ -73,7 +73,7 @@ def handle_message(user_id, message_text):
             reply += "\n"
         return reply
     elif message_text.lower() == "get":
-        content = message_text[3:].strip()
+        content = message_text[4:].strip()
         date_str= content if content else datetime.now().strftime("%Y-%m-%d")
         rows = get_one_day_transactions(date_str)
         if not rows:
