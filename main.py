@@ -87,7 +87,7 @@ def handle_message(user_id, message_text):
                 reply += f" ({note})"
             reply += "\n"
         return reply
-    elif message_text.startswith("get_month "):#get a month record
+    elif message_text.startswith("get month "):#get a month record
         content = message_text[10:].strip()
         month_str= content if content else f"wrong time format, please use YYYY-MM"
         rows = get_one_month_transactions(month_str)
@@ -101,12 +101,12 @@ def handle_message(user_id, message_text):
                 reply += f" ({note})"
             reply += "\n"
         return reply
-    elif message_text.startswith("get_month_total "):#get a month total
+    elif message_text.startswith("get month total "):#get a month total
         content = message_text[16:].strip()
         month_str= content if content else f"wrong time format, please use YYYY-MM"
         total = get_one_month_total(month_str)
         return f"Total Expenditure of {month_str} is : {total} dollars"
-    elif message_text.lower() == "get_this_month_transactions":
+    elif message_text.lower() == "get this month transactions":
         rows = get_this_month_transactions()
         if not rows:
             return "本月沒有紀錄。"
@@ -118,9 +118,11 @@ def handle_message(user_id, message_text):
                 reply += f" ({note})"
             reply += "\n"
         return reply
-    elif message_text.lower() == "get_this_month_total":
+    elif message_text.lower() == "get this month total":
         total = get_this_month_total()
         return f"Total Expenditure of this month is : {total} dollars"
+    elif message_text.lower() == "test":
+        return "test success"
     else:
         return "沒指令，請用 spend/income 開頭，或輸入 today/list 查詢"
 
