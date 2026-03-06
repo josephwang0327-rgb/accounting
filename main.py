@@ -68,28 +68,32 @@ def handle_message(user_id, message_text):
         reply = "Record of today:\n"
         for r in rows:
             category, amount, note, created_at = r
-            reply += f"{created_at} - {category} {amount} 元"
+            reply += f"{created_at} - {category} {amount} dollars"
             if note:
                 reply += f" ({note})"
             reply += "\n"
         return reply
     elif message_text.startswith("get_day "):#get a day record
         content = message_text[8:].strip()
-        date_str= content if content else datetime.now().strftime("%Y-%m-%d")
+        date_str= content
+        if not date_str:
+            return "wrong time format, please use YYYY-MM-DD"
         rows = get_one_day_transactions(date_str)
         if not rows:
             return f"{date_str} 沒有紀錄。"
         reply = f"Records for {date_str} :\n"
         for r in rows:
             category, amount, note, created_at = r
-            reply += f"{created_at} - {category} {amount} 元"
+            reply += f"{created_at} - {category} {amount} dollars"
             if note:
                 reply += f" ({note})"
             reply += "\n"
         return reply
-    elif message_text.startswith("get month "):#get a month record
+    elif message_text.startswith("get_month "):#get a month record
         content = message_text[10:].strip()
-        month_str= content if content else f"wrong time format, please use YYYY-MM"
+        month_str= content
+        if not month_str:
+            return "wrong time format, please use YYYY-MM"
         rows = get_one_month_transactions(month_str)
         if not rows:
             return f"{month_str} no records."
@@ -101,12 +105,15 @@ def handle_message(user_id, message_text):
                 reply += f" ({note})"
             reply += "\n"
         return reply
-    elif message_text.startswith("get month total "):#get a month total
+    elif message_text.startswith("get_month_total "):#get a month total
         content = message_text[16:].strip()
-        month_str= content if content else f"wrong time format, please use YYYY-MM"
+        month_str= content
+        if not month_str:
+            return "wrong time format, please use YYYY-MM"
         total = get_one_month_total(month_str)
         return f"Total Expenditure of {month_str} is : {total} dollars"
-    elif message_text.lower() == "get this month transactions":
+    
+    elif message_text.lower() == "get_this_month_transactions":
         rows = get_this_month_transactions()
         if not rows:
             return "本月沒有紀錄。"
@@ -118,13 +125,24 @@ def handle_message(user_id, message_text):
                 reply += f" ({note})"
             reply += "\n"
         return reply
-    elif message_text.lower() == "get this month total":
+    elif message_text.lower() == "get_this_month_total":
         total = get_this_month_total()
         return f"Total Expenditure of this month is : {total} dollars"
     elif message_text.lower() == "test":
         return "test success"
+    elif message_text.lower() == "help":
+        return ("指令說明:\n"
+                "1. spend category amount [note] - Record expenditure\n"
+                "2. income source amount [note] - Recorded income\n"
+                "3. today - Query today's total expenditure\n"
+                "4. list - Query today's details\n"
+                "5. get_day YYYY-MM-DD - Query records for a specific date\n"
+                "6. get_month YYYY-MM - Query records for a specific month\n"
+                "7. get_month_total YYYY-MM - Query total expenditure for a specific month\n"
+                "8. get_this_month_transactions - Query records for this month\n"
+                "9. get_this_month_total - Query total expenditure for this month")
     else:
-        return "沒指令，請用 spend/income 開頭，或輸入 today/list 查詢"
+        return "Command not recognized. Type 'help' for instructions."
 
 # 將 Flask app 與 Line Bot handler 結合
 create_line_bot(app, handle_message)
