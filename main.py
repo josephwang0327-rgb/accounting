@@ -89,7 +89,7 @@ def handle_message(user_id, message_text):
         return reply
     elif message_text.startswith("get_month "):#get a month record
         content = message_text[10:].strip()
-        month_str= content if content else return f"wrong time format, please use YYYY-MM"
+        month_str= content if content else f"wrong time format, please use YYYY-MM"
         rows = get_one_month_transactions(month_str)
         if not rows:
             return f"{month_str} no records."
@@ -103,7 +103,7 @@ def handle_message(user_id, message_text):
         return reply
     elif message_text.startswith("get_month_total "):#get a month total
         content = message_text[16:].strip()
-        month_str= content if content else f"{wrong time format, please use YYYY-MM}"
+        month_str= content if content else f"wrong time format, please use YYYY-MM"
         total = get_one_month_total(month_str)
         return f"Total Expenditure of {month_str} is : {total} dollars"
     elif message_text.lower() == "get_this_month_transactions":
