@@ -89,6 +89,7 @@ def handle_message(user_id, message_text):
                 reply += f" ({note})"
             reply += "\n"
         return reply
+    
     elif message_text.startswith("get_month "):#get a month record
         content = message_text[10:].strip()
         month_str= content
@@ -129,7 +130,7 @@ def handle_message(user_id, message_text):
         total = get_this_month_total()
         return f"Total Expenditure of this month is : {total} dollars"
     elif message_text.lower() == "test":
-        return "test success"
+        return "test successful"
     elif message_text.lower() == "help":
         return ("指令說明:\n"
                 "1. spend category amount [note] - Record expenditure\n"

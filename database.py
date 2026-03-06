@@ -73,11 +73,21 @@ def get_this_month_transactions():
     conn.close()
     return rows
 
-def get_this_month_total():
+'''def get_this_month_total():
     conn = psycopg2.connect(os.environ["DATABASE_URL"])
     cur = conn.cursor()
     cur.execute(
         "SELECT SUM(amount) FROM transactions WHERE DATE_TRUNC('month', created_at) = DATE_TRUNC('month', CURRENT_DATE)"
+    )
+    total = cur.fetchone()[0] or 0
+    conn.close()
+    return total'''
+def get_this_month_total():
+    conn = psycopg2.connect(os.environ["DATABASE_URL"])
+    cur = conn.cursor()
+    # 同樣需要將 created_at 強制轉型為 timestamp
+    cur.execute(
+        "SELECT SUM(amount) FROM transactions WHERE DATE_TRUNC('month', created_at::timestamp) = DATE_TRUNC('month', CURRENT_DATE)"
     )
     total = cur.fetchone()[0] or 0
     conn.close()
