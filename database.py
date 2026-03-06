@@ -62,3 +62,45 @@ def get_one_day_transactions(date_str):
     rows = cur.fetchall()
     conn.close()
     return rows
+
+def get_this_month_transactions():
+    conn = psycopg2.connect(os.environ["DATABASE_URL"])
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT category, amount, note, created_at FROM transactions WHERE DATE_TRUNC('month', created_at) = DATE_TRUNC('month', CURRENT_DATE) ORDER BY created_at ASC"
+    )
+    rows = cur.fetchall()
+    conn.close()
+    return rows
+
+def get_this_month_total():
+    conn = psycopg2.connect(os.environ["DATABASE_URL"])
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT SUM(amount) FROM transactions WHERE DATE_TRUNC('month', created_at) = DATE_TRUNC('month', CURRENT_DATE)"
+    )
+    total = cur.fetchone()[0] or 0
+    conn.close()
+    return total
+
+def get_one_month_transactions(month_str):
+    conn = psycopg2.connect(os.environ["DATABASE_URL"])
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT category, amount, note, created_at FROM transactions WHERE DATE_TRUNC('month', created_at) = DATE_TRUNC('month', %s::date) ORDER BY created_at ASC",
+        (month_str,)
+    )
+    rows = cur.fetchall()
+    conn.close()
+    return rows
+
+def get_one_month_total(month_str):
+    conn = psycopg2.connect(os.environ["DATABASE_URL"])
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT SUM(amount) FROM transactions WHERE DATE_TRUNC('month', created_at) = DATE_TRUNC('month', %s::date)",
+        (month_str,)
+    )
+    total = cur.fetchone()[0] or 0
+    conn.close()
+    return total

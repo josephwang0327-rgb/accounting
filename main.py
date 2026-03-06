@@ -1,6 +1,7 @@
 from flask import Flask
 from line_bot_interface import create_line_bot
 from database import init_db, add_transaction, get_daily_total, get_transactions, get_one_day_transactions
+from database import get_one_month_total, get_this_month_transactions, get_this_month_total, get_one_month_transactions
 from datetime import datetime
 
 
@@ -29,7 +30,7 @@ def handle_message(user_id, message_text):
             note = parts[2] if len(parts) == 3 else None
 
             add_transaction(category, amount, note)
-            return f"已紀錄支出: {category} {amount} 元" + (f"，備註: {note}" if note else "")
+            return f"已紀錄支出: {category} {amount} 元" + (f" note: {note}" if note else "")
 
         except ValueError:
             return "金額格式錯誤，請輸入數字。"
@@ -47,7 +48,7 @@ def handle_message(user_id, message_text):
             note = parts[2] if len(parts) == 3 else None
 
             add_transaction(category, amount, note)
-            return f"已紀錄收入: {category} {amount} 元" + (f"，備註: {note}" if note else "")
+            return f"已紀錄收入: {category} {amount} 元" + (f" note: {note}" if note else "")
 
         except ValueError:
             return "金額格式錯誤，請輸入數字。"
@@ -64,7 +65,7 @@ def handle_message(user_id, message_text):
         rows = get_transactions(today_str)
         if not rows:
             return "今天沒有任何紀錄。"
-        reply = "今天紀錄:\n"
+        reply = "Record of today:\n"
         for r in rows:
             category, amount, note, created_at = r
             reply += f"{created_at} - {category} {amount} 元"
@@ -72,13 +73,13 @@ def handle_message(user_id, message_text):
                 reply += f" ({note})"
             reply += "\n"
         return reply
-    elif message_text.startswith("get "):
-        content = message_text[4:].strip()
+    elif message_text.startswith("get_day "):#get a day record
+        content = message_text[8:].strip()
         date_str= content if content else datetime.now().strftime("%Y-%m-%d")
         rows = get_one_day_transactions(date_str)
         if not rows:
             return f"{date_str} 沒有紀錄。"
-        reply = f"{date_str} 紀錄:\n"
+        reply = f"Records for {date_str} :\n"
         for r in rows:
             category, amount, note, created_at = r
             reply += f"{created_at} - {category} {amount} 元"
@@ -86,7 +87,40 @@ def handle_message(user_id, message_text):
                 reply += f" ({note})"
             reply += "\n"
         return reply
-
+    elif message_text.startswith("get_month "):#get a month record
+        content = message_text[10:].strip()
+        month_str= content if content else f"{wrong time format, please use YYYY-MM}"
+        rows = get_one_month_transactions(month_str)
+        if not rows:
+            return f"{month_str} no records."
+        reply = f"Records for {month_str} :\n"
+        for r in rows:
+            category, amount, note, created_at = r
+            reply += f"{created_at} - {category} {amount} dollars"
+            if note:
+                reply += f" ({note})"
+            reply += "\n"
+        return reply
+    elif message_text.startswith("get_month_total "):#get a month total
+        content = message_text[16:].strip()
+        month_str= content if content else f"{wrong time format, please use YYYY-MM}"
+        total = get_one_month_total(month_str)
+        return f"Total Expenditure of {month_str} is : {total} dollars"
+    elif message_text.lower() == "get_this_month_transactions":
+        rows = get_this_month_transactions()
+        if not rows:
+            return "本月沒有紀錄。"
+        reply = "本月紀錄:\n"
+        for r in rows:
+            category, amount, note, created_at = r
+            reply += f"{created_at} - {category} {amount} dollars"
+            if note:
+                reply += f" ({note})"
+            reply += "\n"
+        return reply
+    elif message_text.lower() == "get_this_month_total":
+        total = get_this_month_total()
+        return f"Total Expenditure of this month is : {total} dollars"
     else:
         return "沒指令，請用 spend/income 開頭，或輸入 today/list 查詢"
 
