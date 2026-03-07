@@ -1,7 +1,7 @@
 from flask import Flask
 from line_bot_interface import create_line_bot
 from database import init_db, add_transaction, get_daily_total, get_transactions, get_one_day_transactions
-from database import get_one_month_total, get_this_month_transactions, get_this_month_total, get_one_month_transactions
+from database import get_one_month_total, get_this_month, get_one_month_transactions
 from datetime import datetime
 
 
@@ -114,21 +114,19 @@ def handle_message(user_id, message_text):
         total = get_one_month_total(month_str)
         return f"Total Expenditure of {month_str} is : {total} dollars"
     
-    elif message_text.lower() == "get_this_month_transactions":
-        rows = get_this_month_transactions()
+    elif message_text.lower() == "get_this_month":
+        rows, total = get_this_month()
         if not rows:
-            return "本月沒有紀錄。"
-        reply = "本月紀錄:\n"
+            return "This month no records."
+        reply = "Record of this month:\n"
         for r in rows:
             category, amount, note, created_at = r
             reply += f"{created_at} - {category} {amount} dollars"
             if note:
                 reply += f" ({note})"
             reply += "\n"
+        reply += f"Total Expenditure of this month is : {total} dollars"
         return reply
-    elif message_text.lower() == "get_this_month_total":
-        total = get_this_month_total()
-        return f"Total Expenditure of this month is : {total} dollars"
     elif message_text.lower() == "test":
         return "test successful"
     elif message_text.lower() == "help":
@@ -140,8 +138,7 @@ def handle_message(user_id, message_text):
                 "5. get_day YYYY-MM-DD - Query records for a specific date\n"
                 "6. get_month YYYY-MM - Query records for a specific month\n"
                 "7. get_month_total YYYY-MM - Query total expenditure for a specific month\n"
-                "8. get_this_month_transactions - Query records for this month\n"
-                "9. get_this_month_total - Query total expenditure for this month")
+                "8. get_this_month_transactions - Query records and total for this month")
     else:
         return "Command not recognized. Type 'help' for instructions."
 
