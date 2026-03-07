@@ -30,18 +30,23 @@ def add_transaction(category, amount, note=None):
     conn.commit()
     conn.close()
 
-def get_daily_total(date_str):
+def get_daily(date_str):
     conn = psycopg2.connect(os.environ["DATABASE_URL"])
     cur = conn.cursor()
+    cur.execute(
+        "SELECT category, amount, note, created_at FROM transactions WHERE DATE(created_at) = %s ORDER BY created_at ASC",
+        (date_str,)
+    )
+    rows = cur.fetchall()
     cur.execute(
         "SELECT SUM(amount) FROM transactions WHERE DATE(created_at) = %s",
         (date_str,)
     )
     total = cur.fetchone()[0] or 0
     conn.close()
-    return total
+    return rows, total
 
-def get_transactions(date_str):
+def get_one_day(date_str):
     conn = psycopg2.connect(os.environ["DATABASE_URL"])
     cur = conn.cursor()
     cur.execute(
@@ -49,19 +54,13 @@ def get_transactions(date_str):
         (date_str,)
     )
     rows = cur.fetchall()
-    conn.close()
-    return rows
-
-def get_one_day_transactions(date_str):
-    conn = psycopg2.connect(os.environ["DATABASE_URL"])
-    cur = conn.cursor()
     cur.execute(
-        "SELECT category, amount, note, created_at FROM transactions WHERE DATE(created_at) = %s ORDER BY created_at ASC",
+        "SELECT SUM(amount) FROM transactions WHERE DATE(created_at) = %s",
         (date_str,)
     )
-    rows = cur.fetchall()
+    total = cur.fetchone()[0] or 0
     conn.close()
-    return rows
+    return rows, total
 
 def get_this_month():
     conn = psycopg2.connect(os.environ["DATABASE_URL"])
