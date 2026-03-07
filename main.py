@@ -1,7 +1,7 @@
 from flask import Flask
 from line_bot_interface import create_line_bot
 from database import init_db, add_transaction, get_daily_total, get_transactions, get_one_day_transactions
-from database import get_one_month_total, get_this_month, get_one_month_transactions
+from database import get_this_month, get_one_month
 from datetime import datetime
 
 
@@ -95,7 +95,7 @@ def handle_message(user_id, message_text):
         month_str= content
         if not month_str:
             return "wrong time format, please use YYYY-MM"
-        rows = get_one_month_transactions(month_str)
+        rows, total = get_one_month(month_str)
         if not rows:
             return f"{month_str} no records."
         reply = f"Records for {month_str} :\n"
@@ -105,15 +105,8 @@ def handle_message(user_id, message_text):
             if note:
                 reply += f" ({note})"
             reply += "\n"
+        reply += f"Total Expenditure of {month_str} is : {total} dollars"
         return reply
-    elif message_text.startswith("get_month_total "):#get a month total
-        content = message_text[16:].strip()
-        month_str= content
-        if not month_str:
-            return "wrong time format, please use YYYY-MM"
-        total = get_one_month_total(month_str)
-        return f"Total Expenditure of {month_str} is : {total} dollars"
-    
     elif message_text.lower() == "get_this_month":
         rows, total = get_this_month()
         if not rows:
@@ -136,9 +129,8 @@ def handle_message(user_id, message_text):
                 "3. today - Query today's total expenditure\n"
                 "4. list - Query today's details\n"
                 "5. get_day YYYY-MM-DD - Query records for a specific date\n"
-                "6. get_month YYYY-MM - Query records for a specific month\n"
-                "7. get_month_total YYYY-MM - Query total expenditure for a specific month\n"
-                "8. get_this_month_transactions - Query records and total for this month")
+                "6. get_month YYYY-MM - Query records and total for a specific month\n"
+                "7. get_this_month - Query records and total for this month")
     else:
         return "Command not recognized. Type 'help' for instructions."
 

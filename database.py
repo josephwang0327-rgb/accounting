@@ -77,18 +77,7 @@ def get_this_month():
     conn.close()
     return rows, total
 
-'''def get_this_month_total():
-    conn = psycopg2.connect(os.environ["DATABASE_URL"])
-    cur = conn.cursor()
-    # 同樣需要將 created_at 強制轉型為 timestamp
-    cur.execute(
-        "SELECT SUM(amount) FROM transactions WHERE DATE_TRUNC('month', created_at::timestamp) = DATE_TRUNC('month', CURRENT_DATE)"
-    )
-    total = cur.fetchone()[0] or 0
-    conn.close()
-    return total'''
-
-def get_one_month_transactions(month_str):
+def get_one_month(month_str):
     conn = psycopg2.connect(os.environ["DATABASE_URL"])
     cur = conn.cursor()
     # 關鍵：將 TEXT 轉為 TIMESTAMP，並將輸入補齊為 YYYY-MM-01
@@ -102,10 +91,15 @@ def get_one_month_transactions(month_str):
     formatted_month = f"{month_str}-01" 
     cur.execute(query, (formatted_month,))
     rows = cur.fetchall()
+    cur.execute(
+        "SELECT SUM(amount) FROM transactions WHERE DATE_TRUNC('month', created_at::timestamp) = DATE_TRUNC('month', %s::date)",
+        (month_str,)
+    )
+    total = cur.fetchone()[0] or 0
     conn.close()
-    return rows
+    return rows, total
 
-def get_one_month_total(month_str):
+'''def get_one_month_total(month_str):
     conn = psycopg2.connect(os.environ["DATABASE_URL"])
     cur = conn.cursor()
     cur.execute(
@@ -114,4 +108,4 @@ def get_one_month_total(month_str):
     )
     total = cur.fetchone()[0] or 0
     conn.close()
-    return total
+    return total'''
