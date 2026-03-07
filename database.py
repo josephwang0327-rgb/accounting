@@ -93,7 +93,7 @@ def get_one_month(month_str):
     rows = cur.fetchall()
     cur.execute(
         "SELECT SUM(amount) FROM transactions WHERE DATE_TRUNC('month', created_at::timestamp) = DATE_TRUNC('month', %s::date)",
-        (month_str,)
+        (formatted_month,)
     )
     total = cur.fetchone()[0] or 0
     conn.close()
